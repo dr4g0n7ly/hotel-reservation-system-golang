@@ -1,13 +1,15 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
+	"github.com/gofiber/fiber/v2"
+)
 
 func main() {
 	app := fiber.New()
-	app.Get("/foo", handleFoo)
-	app.Listen(":5000")
-}
+	apiv1 := app.Group("/api/v1")
 
-func handleFoo(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"msg": "working just fine"})
+	apiv1.Get("/users", api.HandleGetUsers)
+	apiv1.Get("/user/:id", api.HandleGetUser)
+	app.Listen(":5000")
 }
