@@ -1,11 +1,22 @@
 package api
 
-import "github.com/gofiber/fiber/v2"
+import (
+	types "github.com/dr4g0n7ly/hotel-management-system-golang/types"
+	"github.com/gofiber/fiber/v2"
+)
 
 func HandleGetUser(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"user": "user 1"})
+	u := types.User{
+		FirstName: "James",
+		LastName:  "Foo",
+	}
+	return c.JSON(u)
 }
 
 func HandleGetUsers(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"user": "user 1"})
+	u := types.User{
+		FirstName: "James",
+		LastName:  "Foo",
+	}
+	return c.JSON(u)
 }
