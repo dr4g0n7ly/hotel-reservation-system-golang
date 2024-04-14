@@ -6,7 +6,7 @@ import (
 	"log"
 
 	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
-	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
+	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,26 +21,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	ctx := context.Background()
-	coll := client.Database(dbname).Collection(userColl)
-	user := types.User{
-		FirstName: "James",
-		LastName:  "Bond",
-	}
-	res, err := coll.InsertOne(ctx, user)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(res)
-
 	fmt.Println("Connected to MongoDB")
-	fmt.Println(client)
+
+	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
 
 	app := fiber.New()
 	apiv1 := app.Group("/api/v1")
 
-	apiv1.Get("/users", api.HandleGetUsers)
-	apiv1.Get("/user/:id", api.HandleGetUser)
+	apiv1.Get("/users", userHandler.HandleGetUsers)
+	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 	app.Listen(":5000")
 }
