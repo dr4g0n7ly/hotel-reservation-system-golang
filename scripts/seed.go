@@ -7,6 +7,7 @@ import (
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -20,12 +21,17 @@ func main() {
 	}
 	fmt.Println("Connected to MongoDB")
 
+	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
+		log.Fatal(err)
+	}
+
 	hotelStore := db.NewMongoHotelStore(client, db.DBNAME)
-	roomStore := db.NewMongoRoomStore(client, db.DBNAME)
+	roomStore := db.NewMongoRoomStore(client, hotelStore)
 
 	hotel := types.Hotel{
 		Name:     "Golden Hotel",
 		Location: "Bucharest, Romania",
+		Rooms:    []primitive.ObjectID{},
 	}
 
 	insertedHotel, err := hotelStore.InsertHotel(ctx, &hotel)
