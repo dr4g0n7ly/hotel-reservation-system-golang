@@ -13,8 +13,8 @@ type RoomType int
 
 const (
 	_ RoomType = iota
-	SingleBed
-	DoubleBed
+	Single
+	Double
 	Deluxe
 	Suite
 )
