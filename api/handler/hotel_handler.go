@@ -10,7 +10,7 @@ type HotelHandler struct {
 	roomStore  db.RoomStore
 }
 
-func newHotelHandler(h db.HotelStore, r db.RoomStore) *HotelHandler {
+func NewHotelHandler(h db.HotelStore, r db.RoomStore) *HotelHandler {
 	return &HotelHandler{
 		hotelStore: h,
 		roomStore:  r,
