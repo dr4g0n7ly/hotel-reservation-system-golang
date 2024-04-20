@@ -32,6 +32,7 @@ func main() {
 		Name:     "Golden Hotel",
 		Location: "Bucharest, Romania",
 		Rooms:    []primitive.ObjectID{},
+		Rating:   7,
 	}
 
 	insertedHotel, err := hotelStore.InsertHotel(ctx, &hotel)
