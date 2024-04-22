@@ -6,6 +6,7 @@ import (
 	"log"
 
 	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
+	"github.com/dr4g0n7ly/hotel-management-system-golang/api/middleware"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -41,7 +42,7 @@ func main() {
 	hotelHandler := api.NewHotelHandler(store)
 
 	app := fiber.New(config)
-	apiv1 := app.Group("/api/v1")
+	apiv1 := app.Group("/api/v1", middleware.JWTAuthentication)
 
 	// user handlers
 	apiv1.Get("/users", userHandler.HandleGetUsers)
