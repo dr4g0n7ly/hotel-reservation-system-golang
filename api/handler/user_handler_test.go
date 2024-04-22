@@ -17,11 +17,11 @@ import (
 )
 
 type testdb struct {
-	db.UserStore
+	db.Store
 }
 
 func (tbd *testdb) teardown(t *testing.T) {
-	if err := tbd.UserStore.Drop(context.TODO()); err != nil {
+	if err := tbd.User.Drop(context.TODO()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -34,7 +34,9 @@ func setup(t *testing.T) *testdb {
 	fmt.Println("Connected to MongoDB")
 
 	return &testdb{
-		UserStore: db.NewMongoUserStore(client, db.TestDBNAME),
+		Store: db.Store{
+			User: db.NewMongoUserStore(client),
+		},
 	}
 }
 
@@ -43,7 +45,7 @@ func TestPostUser(t *testing.T) {
 	defer tdb.teardown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb)
+	userHandler := NewUserHandler(tdb.Store)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := types.CreateUserParams{
@@ -75,7 +77,7 @@ func TestGetUser(t *testing.T) {
 	defer tdb.teardown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb)
+	userHandler := NewUserHandler(tdb.Store)
 
 	app.Post("/", userHandler.HandlePostUser)
 	params := types.CreateUserParams{

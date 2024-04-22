@@ -10,9 +10,9 @@ type UserHandler struct {
 	userStore db.UserStore
 }
 
-func NewUserHandler(userStore db.UserStore) *UserHandler {
+func NewUserHandler(store db.Store) *UserHandler {
 	return &UserHandler{
-		userStore: userStore,
+		userStore: store.User,
 	}
 }
 

@@ -26,12 +26,19 @@ func main() {
 	}
 	fmt.Println("Connected to MongoDB")
 
-	userStore := db.NewMongoUserStore(client, db.DBNAME)
-	userHandler := api.NewUserHandler(userStore)
+	var (
+		userStore  = db.NewMongoUserStore(client)
+		hotelStore = db.NewMongoHotelStore(client)
+		roomStore  = db.NewMongoRoomStore(client, hotelStore)
+		store      = db.Store{
+			User:  userStore,
+			Hotel: hotelStore,
+			Room:  roomStore,
+		}
+	)
 
-	hotelStore := db.NewMongoHotelStore(client, db.DBNAME)
-	roomStore := db.NewMongoRoomStore(client, hotelStore)
-	hotelHandler := api.NewHotelHandler(hotelStore, roomStore)
+	userHandler := api.NewUserHandler(store)
+	hotelHandler := api.NewHotelHandler(store)
 
 	app := fiber.New(config)
 	apiv1 := app.Group("/api/v1")
@@ -45,5 +52,6 @@ func main() {
 	// hotel handlers
 	apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
 	apiv1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
+	apiv1.Get("/hotel/:id", hotelHandler.HandleGetHotel)
 	app.Listen(":5000")
 }
