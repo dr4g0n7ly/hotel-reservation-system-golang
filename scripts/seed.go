@@ -12,36 +12,35 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func main() {
-	ctx := context.Background()
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+func seedUser(client *mongo.Client, email string, firstname string, lastname string, password string) {
+	userStore := db.NewMongoUserStore(client)
+	user, err := types.NewUserFromParams(types.CreateUserParams{
+		Email:     email,
+		FirstName: firstname,
+		LastName:  lastname,
+		Password:  password,
+	})
+	insertedUser, err := userStore.InsertUser(context.Background(), user)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected to MongoDB")
+	fmt.Println(insertedUser)
+}
 
-	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
+func seedHotel(client *mongo.Client, name string, location string, rating int) {
 	hotelStore := db.NewMongoHotelStore(client)
 	roomStore := db.NewMongoRoomStore(client, hotelStore)
 
-	fmt.Println("seeding the database")
-
 	hotel := types.Hotel{
-		Name:     "Golden Hotel",
-		Location: "Bucharest, Romania",
+		Name:     name,
+		Location: location,
 		Rooms:    []primitive.ObjectID{},
-		Rating:   7,
+		Rating:   rating,
 	}
-
-	insertedHotel, err := hotelStore.InsertHotel(ctx, &hotel)
+	insertedHotel, err := hotelStore.InsertHotel(context.Background(), &hotel)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	rooms := []types.Room{
 		{
 			Type:  types.Single,
@@ -60,47 +59,34 @@ func main() {
 			Price: 1399,
 		},
 	}
-
 	for _, room := range rooms {
 		room.HotelID = insertedHotel.ID
-		insertedRoom, err := roomStore.InsertRoom(ctx, &room)
+		insertedRoom, err := roomStore.InsertRoom(context.Background(), &room)
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println(insertedRoom)
 	}
-
 	fmt.Println(insertedHotel)
 
-	hotel = types.Hotel{
-		Name:     "Anothher Hotel",
-		Location: "Mumbai, India",
-		Rooms:    []primitive.ObjectID{},
-		Rating:   3,
-	}
+}
 
-	insertedHotel, err = hotelStore.InsertHotel(ctx, &hotel)
+func main() {
+
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Connected to MongoDB")
 
-	rooms = []types.Room{
-		{
-			Type:  types.Single,
-			Price: 11,
-		},
-		{
-			Type:  types.Deluxe,
-			Price: 47,
-		},
+	if err := client.Database(db.DBNAME).Drop(context.Background()); err != nil {
+		log.Fatal(err)
 	}
 
-	for _, room := range rooms {
-		room.HotelID = insertedHotel.ID
-		insertedRoom, err := roomStore.InsertRoom(ctx, &room)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(insertedRoom)
-	}
+	seedUser(client, "foo.bar@gmail.com", "foo", "bar", "securePassword")
+	seedUser(client, "jack.baz@gmail.com", "jack", "baz", "notsecurePassword")
+	seedHotel(client, "Park Hyatt", "Hyderabad", 6)
+	seedHotel(client, "Grand Hotel", "Bucharest", 8)
+
+	fmt.Println("seeding the database")
 }

@@ -15,7 +15,15 @@ const (
 	minPasswordLen = 7
 )
 
-func validMailAddress(address string) (string, bool) {
+func ValidPassword(encpw, pw string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func ValidMailAddress(address string) (string, bool) {
 	addr, err := mail.ParseAddress(address)
 	if err != nil {
 		return "", false
@@ -49,7 +57,7 @@ func (params CreateUserParams) Validate() map[string]string {
 	if len(params.Password) < minPasswordLen {
 		errors["email"] = fmt.Sprintf("password lenght should be atleast %d characters", minPasswordLen)
 	}
-	if _, ok := validMailAddress(params.Email); ok {
+	if _, ok := ValidMailAddress(params.Email); ok {
 		// params.Email = addr
 	} else {
 		errors["password"] = fmt.Sprintf("invalid email")
