@@ -33,6 +33,18 @@ type AuthResponse struct {
 	Token string      `json:"token"`
 }
 
+type GenericResponse struct {
+	Type string `json:"type"`
+	Msg  string `json:"msg"`
+}
+
+func InvalidCredentials(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusUnauthorized).JSON(GenericResponse{
+		Type: "error",
+		Msg:  "Invalid credentials",
+	})
+}
+
 func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	var params AuthParams
 	if err := c.BodyParser(&params); err != nil {
@@ -42,13 +54,13 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	user, err := h.userStore.GetUserByEmail(c.Context(), params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("invalid credentials")
+			return InvalidCredentials(c)
 		}
 		return err
 	}
 
 	if !types.ValidPassword(user.EncryptedPassword, params.Password) {
-		return fmt.Errorf("invalid credentials")
+		return InvalidCredentials(c)
 	}
 
 	res := AuthResponse{
