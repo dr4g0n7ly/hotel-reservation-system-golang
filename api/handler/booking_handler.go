@@ -16,9 +16,18 @@ func NewBookingHandler(store db.Store) *BookingHandler {
 }
 
 func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
-	return nil
+	bookings, err := h.store.Booking.GetBookings(c.Context(), nil)
+	if err != nil {
+		return err
+	}
+	return c.JSON(bookings)
 }
 
 func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
-	return nil
+	id := c.Params("id")
+	booking, err := h.store.Booking.GetBookingByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(booking)
 }
