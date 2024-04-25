@@ -28,13 +28,15 @@ func main() {
 	fmt.Println("Connected to MongoDB")
 
 	var (
-		userStore  = db.NewMongoUserStore(client)
-		hotelStore = db.NewMongoHotelStore(client)
-		roomStore  = db.NewMongoRoomStore(client, hotelStore)
-		store      = db.Store{
-			User:  userStore,
-			Hotel: hotelStore,
-			Room:  roomStore,
+		userStore    = db.NewMongoUserStore(client)
+		hotelStore   = db.NewMongoHotelStore(client)
+		roomStore    = db.NewMongoRoomStore(client, hotelStore)
+		bookingStore = db.NewMongoBookingStore(client)
+		store        = db.Store{
+			User:    userStore,
+			Hotel:   hotelStore,
+			Room:    roomStore,
+			Booking: bookingStore,
 		}
 	)
 

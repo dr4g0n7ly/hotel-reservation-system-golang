@@ -9,7 +9,7 @@ import (
 )
 
 type BookingStore interface {
-	InsertHotel(context.Context, *types.Booking) (*types.Booking, error)
+	InsertBooking(context.Context, *types.Booking) (*types.Booking, error)
 }
 
 type MongoBookingStore struct {
