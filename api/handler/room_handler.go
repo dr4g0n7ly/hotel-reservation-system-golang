@@ -24,6 +24,7 @@ func (p BookRoomParams) validate() error {
 		return fmt.Errorf("invalid booking date")
 	}
 	if p.FromDate.After(p.TillDate) || p.FromDate == p.TillDate {
+		fmt.Println(p.FromDate, p.TillDate)
 		return fmt.Errorf("invalid booking dates")
 	}
 	return nil
@@ -41,11 +42,11 @@ func NewRoomHandler(store db.Store) *RoomHandler {
 
 func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	var params BookRoomParams
-	if err := params.validate(); err != nil {
-		return err
-	}
 	if err := c.BodyParser(&params); err != nil {
 		fmt.Println("Error parsing req.body")
+		return err
+	}
+	if err := params.validate(); err != nil {
 		return err
 	}
 
@@ -63,12 +64,12 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{
-		"_id": roomOID,
+		"roomId": roomOID,
 		"fromDate": bson.M{
 			"$gte": params.FromDate,
 		},
 		"tillDate": bson.M{
-			"lte": params.TillDate,
+			"$lte": params.TillDate,
 		},
 	}
 
@@ -76,7 +77,6 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
 	if len(bookings) > 0 {
 		return c.Status(http.StatusBadRequest).JSON(GenericResponse{
 			Type: "error",
