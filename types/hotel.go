@@ -25,6 +25,5 @@ type Room struct {
 	Type       RoomType           `bson:"type" json:"type"`
 	Price      float64            `bson:"price" json:"price"`
 	HotelID    primitive.ObjectID `bson:"hotelId" json:"hotelId"`
-	Available  bool               `bson:"available" json:"available"`
 	MaxPersons int                `bson:"maxPersons" json:"maxPersons"`
 }
