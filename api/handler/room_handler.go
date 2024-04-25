@@ -16,6 +16,17 @@ type BookRoomParams struct {
 	NumPersons int       `json:"numPersons"`
 }
 
+func (p BookRoomParams) validate() error {
+	now := time.Now()
+	if now.After(p.FromDate) {
+		return fmt.Errorf("invalid booking date")
+	}
+	if p.FromDate.After(p.TillDate) || p.FromDate == p.TillDate {
+		return fmt.Errorf("invalid booking dates")
+	}
+	return nil
+}
+
 type RoomHandler struct {
 	store *db.Store
 }
@@ -28,6 +39,9 @@ func NewRoomHandler(store db.Store) *RoomHandler {
 
 func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	var params BookRoomParams
+	if err := params.validate(); err != nil {
+		return err
+	}
 	if err := c.BodyParser(&params); err != nil {
 		fmt.Println("Error parsing req.body")
 		return err
