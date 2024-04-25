@@ -29,6 +29,7 @@ func NewRoomHandler(store db.Store) *RoomHandler {
 func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	var params BookRoomParams
 	if err := c.BodyParser(&params); err != nil {
+		fmt.Println("Error parsing req.body")
 		return err
 	}
 
