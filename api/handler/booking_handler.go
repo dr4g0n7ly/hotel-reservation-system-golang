@@ -1,7 +1,10 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
+	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -29,5 +32,14 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	user, ok := c.Context().UserValue("user").(*types.User)
+	if !ok {
+		return fmt.Errorf("unauthorized")
+	}
+	if user.ID != booking.UserID {
+		return fmt.Errorf("unauthorized")
+	}
+
 	return c.JSON(booking)
 }
