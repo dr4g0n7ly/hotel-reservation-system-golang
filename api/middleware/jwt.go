@@ -12,7 +12,6 @@ import (
 
 func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		fmt.Println("-- JWT Auth")
 
 		token, ok := c.GetReqHeaders()["X-Api-Token"]
 		if !ok {
@@ -24,8 +23,6 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(claims)
 
 		// Check token expiration
 		expFloat := claims["expiresAt"].(float64)
