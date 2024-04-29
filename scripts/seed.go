@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func seedUser(client *mongo.Client, email string, firstname string, lastname string, password string) {
+func seedUser(client *mongo.Client, isAdmin bool, email, firstname, lastname, password string) {
 	userStore := db.NewMongoUserStore(client)
 	user, err := types.NewUserFromParams(types.CreateUserParams{
 		Email:     email,
@@ -20,6 +20,10 @@ func seedUser(client *mongo.Client, email string, firstname string, lastname str
 		LastName:  lastname,
 		Password:  password,
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	user.IsAdmin = isAdmin
 	insertedUser, err := userStore.InsertUser(context.Background(), user)
 	if err != nil {
 		log.Fatal(err)
@@ -83,8 +87,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	seedUser(client, "foo.bar@gmail.com", "foo", "bar", "securePassword")
-	seedUser(client, "jack.baz@gmail.com", "jack", "baz", "notsecurePassword")
+	seedUser(client, false, "foo.bar@gmail.com", "foo", "bar", "password")
+	seedUser(client, false, "jack.baz@gmail.com", "jack", "baz", "password")
+	seedUser(client, true, "admin@gmail.com", "admin", "admin", "adminpassword")
 	seedHotel(client, "Park Hyatt", "Hyderabad", 6)
 	seedHotel(client, "Grand Hotel", "Bucharest", 8)
 
