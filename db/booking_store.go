@@ -66,7 +66,10 @@ func (s *MongoBookingStore) UpdateBookingByID(ctx context.Context, id string, up
 	if err != nil {
 		return err
 	}
-	_, err = s.coll.UpdateByID(ctx, oid, update)
+	m := bson.M{
+		"$set": update,
+	}
+	_, err = s.coll.UpdateByID(ctx, oid, m)
 	if err != nil {
 		return err
 	}

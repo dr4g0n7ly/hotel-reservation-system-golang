@@ -54,6 +54,7 @@ func main() {
 	app.Post("auth", authHandler.HandleAuthenticate)
 
 	// user handlers
+	apiv1.Get("/users", userHandler.HandleGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 	apiv1.Post("user", userHandler.HandlePostUser)
 	apiv1.Delete("user/:id", userHandler.HandleDeleteUser)
@@ -65,7 +66,9 @@ func main() {
 
 	// room / booking handlers
 	apiv1.Post("/room/:id/booking", roomHandler.HandleBookRoom)
+	apiv1.Get("/bookings", bookingHandler.HandleGetBookings)
 	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
+	apiv1.Get("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
 	app.Listen(":5000")
 
 	// admin handlers
