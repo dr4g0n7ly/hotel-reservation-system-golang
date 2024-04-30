@@ -43,3 +43,21 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 
 	return c.JSON(booking)
 }
+
+func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
+	id := c.Params("id")
+	booking, err := h.store.Booking.GetBookingByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	user, ok := c.Context().UserValue("user").(*types.User)
+	if !ok {
+		return fmt.Errorf("unauthorized")
+	}
+	if user.ID != booking.UserID {
+		return fmt.Errorf("unauthorized")
+	}
+
+	return c.JSON(booking)
+}
