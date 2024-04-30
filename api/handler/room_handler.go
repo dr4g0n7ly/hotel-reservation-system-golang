@@ -71,6 +71,7 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		"tillDate": bson.M{
 			"$lte": params.TillDate,
 		},
+		"cancelled": false,
 	}
 
 	bookings, err := h.store.Booking.GetBookings(c.Context(), filter)
