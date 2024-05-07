@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
+	"github.com/dr4g0n7ly/hotel-management-system-golang/db/fixtures"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -86,6 +87,19 @@ func main() {
 	if err := client.Database(db.DBNAME).Drop(context.Background()); err != nil {
 		log.Fatal(err)
 	}
+
+	hotelStore := db.NewMongoHotelStore(client)
+	store := db.Store{
+		User:    db.NewMongoUserStore(client),
+		Booking: db.NewMongoBookingStore(client),
+		Room:    db.NewMongoRoomStore(client, hotelStore),
+		Hotel:   hotelStore,
+	}
+
+	user := fixtures.AddUser(&store, "james", "foo", false)
+	fmt.Println(user)
+
+	return
 
 	seedUser(client, false, "foo.bar@gmail.com", "foo", "bar", "password")
 	seedUser(client, false, "jack.baz@gmail.com", "jack", "baz", "password")
