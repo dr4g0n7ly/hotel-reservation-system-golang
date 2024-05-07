@@ -7,6 +7,7 @@ import (
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func AddUser(store *db.Store, fn, ln string, admin bool) *types.User {
@@ -25,4 +26,22 @@ func AddUser(store *db.Store, fn, ln string, admin bool) *types.User {
 		log.Fatal(err)
 	}
 	return insertedUser
+}
+
+func AddHotel(store *db.Store, name, loc string, rating int, rooms []primitive.ObjectID) *types.Hotel {
+	var roomIDs = rooms
+	if rooms == nil {
+		roomIDs = []primitive.ObjectID{}
+	}
+	hotel := types.Hotel{
+		Name:     name,
+		Location: loc,
+		Rooms:    roomIDs,
+		Rating:   rating,
+	}
+	insertedHotel, err := store.Hotel.InsertHotel(context.Background(), &hotel)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return insertedHotel
 }
