@@ -89,15 +89,18 @@ func main() {
 	}
 
 	hotelStore := db.NewMongoHotelStore(client)
-	store := db.Store{
+	store := &db.Store{
 		User:    db.NewMongoUserStore(client),
 		Booking: db.NewMongoBookingStore(client),
 		Room:    db.NewMongoRoomStore(client, hotelStore),
 		Hotel:   hotelStore,
 	}
 
-	user := fixtures.AddUser(&store, "james", "foo", false)
+	user := fixtures.AddUser(store, "james", "foo", false)
 	fmt.Println(user)
+
+	hotel := fixtures.AddHotel(store, "hotel", "place", 5, nil)
+	fmt.Println(hotel)
 
 	return
 
