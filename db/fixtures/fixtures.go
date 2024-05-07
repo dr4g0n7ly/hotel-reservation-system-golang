@@ -28,6 +28,20 @@ func AddUser(store *db.Store, fn, ln string, admin bool) *types.User {
 	return insertedUser
 }
 
+func AddRoom(store *db.Store, roomType types.RoomType, price float64, hotelID primitive.ObjectID, maxP int) *types.Room {
+	room := &types.Room{
+		Type:       roomType,
+		Price:      price,
+		HotelID:    hotelID,
+		MaxPersons: maxP,
+	}
+	insertedRoom, err := store.Room.InsertRoom(context.Background(), room)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return insertedRoom
+}
+
 func AddHotel(store *db.Store, name, loc string, rating int, rooms []primitive.ObjectID) *types.Hotel {
 	var roomIDs = rooms
 	if rooms == nil {
