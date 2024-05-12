@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
+	"github.com/dr4g0n7ly/hotel-management-system-golang/db/fixtures"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
 	"github.com/gofiber/fiber/v2"
 )
@@ -36,15 +37,15 @@ func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
-	insertedUser := InsertTestUser(t, tdb.User)
+	insertedUser := fixtures.AddUser(tdb.Store, "james", "foo", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.Store)
+	authHandler := NewAuthHandler(*tdb.Store)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
 		Email:    "james@foo.com",
-		Password: "securepassword",
+		Password: "james_foo",
 	}
 	b, _ := json.Marshal(params)
 
@@ -81,7 +82,7 @@ func TestAuthenticateIncorrectPassword(t *testing.T) {
 	_ = insertedUser
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.Store)
+	authHandler := NewAuthHandler(*tdb.Store)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{

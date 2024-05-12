@@ -12,11 +12,13 @@ import (
 )
 
 type testdb struct {
-	db.Store
+	Client *mongo.Client
+	*db.Store
 }
 
 func (tbd *testdb) teardown(t *testing.T) {
-	if err := tbd.User.Drop(context.TODO()); err != nil {
+
+	if err := tbd.Client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -28,9 +30,14 @@ func setup(t *testing.T) *testdb {
 	}
 	fmt.Println("Connected to MongoDB")
 
+	hotelStore := db.NewMongoHotelStore(client)
 	return &testdb{
-		Store: db.Store{
-			User: db.NewMongoUserStore(client),
+		Client: client,
+		Store: &db.Store{
+			User:    db.NewMongoUserStore(client),
+			Hotel:   hotelStore,
+			Room:    db.NewMongoRoomStore(client, hotelStore),
+			Booking: db.NewMongoBookingStore(client),
 		},
 	}
 }
