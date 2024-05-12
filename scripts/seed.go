@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db/fixtures"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
@@ -98,9 +99,13 @@ func main() {
 	}
 
 	user := fixtures.AddUser(store, "james", "foo", false)
+	admin := fixtures.AddUser(store, "admin", "admin", true)
 	hotel := fixtures.AddHotel(store, "hotel", "place", 5, nil)
 	room := fixtures.AddRoom(store, types.Deluxe, 500, hotel.ID, 2)
 	booking := fixtures.AddBooking(store, user.ID, room.ID, time.Now().AddDate(0, 0, 5), time.Now().AddDate(0, 0, 7))
-	fmt.Println(booking)
+
+	fmt.Println("james ->", api.CreateTokenFromUser(user))
+	fmt.Println("admin ->", api.CreateTokenFromUser(admin))
+	fmt.Println("booking ->", booking.ID)
 	return
 }
