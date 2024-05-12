@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/types"
@@ -58,4 +59,18 @@ func AddHotel(store *db.Store, name, loc string, rating int, rooms []primitive.O
 		log.Fatal(err)
 	}
 	return insertedHotel
+}
+
+func AddBooking(store *db.Store, uid, rid primitive.ObjectID, from, till time.Time) *types.Booking {
+	booking := &types.Booking{
+		UserID:   uid,
+		RoomID:   rid,
+		FromDate: from,
+		TillDate: till,
+	}
+	insertedBooking, err := store.Booking.InsertBooking(context.Background(), booking)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return insertedBooking
 }

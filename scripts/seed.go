@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db/fixtures"
@@ -97,18 +98,9 @@ func main() {
 	}
 
 	user := fixtures.AddUser(store, "james", "foo", false)
-	fmt.Println(user)
-
 	hotel := fixtures.AddHotel(store, "hotel", "place", 5, nil)
-	fmt.Println(hotel)
-
+	room := fixtures.AddRoom(store, types.Deluxe, 500, hotel.ID, 2)
+	booking := fixtures.AddBooking(store, user.ID, room.ID, time.Now().AddDate(0, 0, 5), time.Now().AddDate(0, 0, 7))
+	fmt.Println(booking)
 	return
-
-	seedUser(client, false, "foo.bar@gmail.com", "foo", "bar", "password")
-	seedUser(client, false, "jack.baz@gmail.com", "jack", "baz", "password")
-	seedUser(client, true, "admin@gmail.com", "admin", "admin", "adminpassword")
-	seedHotel(client, "Park Hyatt", "Hyderabad", 6)
-	seedHotel(client, "Grand Hotel", "Bucharest", 8)
-
-	fmt.Println("seeding the database")
 }
