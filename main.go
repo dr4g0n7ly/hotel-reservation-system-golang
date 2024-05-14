@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/api/middleware"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/db"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -26,7 +28,8 @@ var config = fiber.Config{
 }
 
 func main() {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	mongodb_uri := os.Getenv("MONGO_DB_URL")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodb_uri))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,9 +77,18 @@ func main() {
 	apiv1.Get("/bookings", bookingHandler.HandleGetBookings)
 	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
 	apiv1.Get("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
-	app.Listen(":5000")
 
 	// admin handlers
 	admin.Get("/users", userHandler.HandleGetUsers)
 	admin.Get("/bookings", bookingHandler.HandleGetBookings)
+
+	http_listen_addr := os.Getenv("HTTP_LISTEN_ADDRESS")
+	app.Listen(http_listen_addr)
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 }
