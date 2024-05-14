@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 
 	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
 	"github.com/dr4g0n7ly/hotel-management-system-golang/api/middleware"
@@ -16,7 +17,11 @@ import (
 // Create a new fiber instance with custom config
 var config = fiber.Config{
 	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		return c.JSON(map[string]string{"error": err.Error()})
+		if apiError, ok := err.(api.Error); ok {
+			return c.Status(apiError.Code).JSON(apiError)
+		}
+		apiError := api.NewError(http.StatusInternalServerError, err.Error())
+		return c.Status(apiError.Code).JSON(apiError.Err)
 	},
 }
 
