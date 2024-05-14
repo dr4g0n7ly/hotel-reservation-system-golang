@@ -6,6 +6,12 @@ const (
 	DBURI      = "mongodb://localhost:27017/"
 )
 
+type QueryFilter struct {
+	Limit  int64
+	Page   int64
+	Rating int
+}
+
 type Store struct {
 	User    UserStore
 	Hotel   HotelStore

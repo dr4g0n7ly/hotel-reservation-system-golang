@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type HotelHandler struct {
@@ -39,13 +38,12 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	page := 3
-	limit := 3
-	opts := options.FindOptions{}
-	opts.SetSkip(int64((page - 1) * limit))
-	opts.SetLimit(int64(limit))
+	var queryFilter db.QueryFilter
+	if err := c.QueryParser(&queryFilter); err != nil {
+		return err
+	}
 
-	hotels, err := h.hotelStore.GetHotels(c.Context(), nil, &opts)
+	hotels, err := h.hotelStore.GetHotels(c.Context(), nil, &queryFilter)
 	if err != nil {
 		return err
 	}
@@ -59,8 +57,11 @@ func (h *HotelHandler) HandleGetHotel(c *fiber.Ctx) error {
 		return ErrInvalidID()
 	}
 	filter := bson.M{"_id": oid}
-	opts := options.FindOptions{}
-	hotels, err := h.hotelStore.GetHotels(c.Context(), filter, &opts)
+	var queryFilter db.QueryFilter
+	if err := c.QueryParser(&queryFilter); err != nil {
+		return err
+	}
+	hotels, err := h.hotelStore.GetHotels(c.Context(), filter, &queryFilter)
 	if err != nil {
 		return err
 	}

@@ -13,7 +13,7 @@ import (
 type HotelStore interface {
 	InsertHotel(context.Context, *types.Hotel) (*types.Hotel, error)
 	UpdateHotel(context.Context, bson.M, bson.M) error
-	GetHotels(context.Context, bson.M, *options.FindOptions) ([]*types.Hotel, error)
+	GetHotels(context.Context, bson.M, *QueryFilter) ([]*types.Hotel, error)
 }
 
 type MongoHotelStore struct {
@@ -42,8 +42,11 @@ func (s *MongoHotelStore) UpdateHotel(ctx context.Context, filter bson.M, update
 	return err
 }
 
-func (s *MongoHotelStore) GetHotels(ctx context.Context, filter bson.M, opts *options.FindOptions) ([]*types.Hotel, error) {
-	res, err := s.coll.Find(ctx, filter, opts)
+func (s *MongoHotelStore) GetHotels(ctx context.Context, filter bson.M, qfilter *QueryFilter) ([]*types.Hotel, error) {
+	opts := options.FindOptions{}
+	opts.SetSkip((qfilter.Page - 1) * qfilter.Limit).SetLimit(qfilter.Limit)
+
+	res, err := s.coll.Find(ctx, filter, &opts)
 	if err != nil {
 		return nil, err
 	}
