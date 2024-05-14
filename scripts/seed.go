@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	api "github.com/dr4g0n7ly/hotel-management-system-golang/api/handler"
@@ -39,6 +40,10 @@ func main() {
 	hotel := fixtures.AddHotel(store, "hotel", "place", 5, nil)
 	room := fixtures.AddRoom(store, types.Deluxe, 500, hotel.ID, 2)
 	booking := fixtures.AddBooking(store, user.ID, room.ID, time.Now().AddDate(0, 0, 5), time.Now().AddDate(0, 0, 7))
+
+	for i := 0; i < 100; i++ {
+		fixtures.AddHotel(store, fmt.Sprintf("hotel %d", i), fmt.Sprintf("location %d", i), rand.Intn(4)+1, nil)
+	}
 
 	fmt.Println("james ->", api.CreateTokenFromUser(user))
 	fmt.Println("admin ->", api.CreateTokenFromUser(admin))
